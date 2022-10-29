@@ -8,3 +8,7 @@ type LinkedList interface {
 	Search(data interface{}) (*Node, error)
 	Size() (int, error)
 }
+
+func NewLinkedList() LinkedList {
+	return nil
+}
