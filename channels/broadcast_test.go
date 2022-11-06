@@ -153,3 +153,44 @@ func TestMultipleBroadcaster(t *testing.T) {
 
 	wg.Wait()
 }
+
+func BenchmarkBroadcaster(b *testing.B) {
+	bc := channels.NewBroadcaster(1000)
+	defer bc.Close()
+	done := make(chan bool)
+
+	msgNumber := b.N
+
+	listenerRoutine := func(msg <-chan interface{}) {
+		i := 0
+		for m := range msg {
+
+			sm, ok := m.(string)
+			if !ok {
+				b.Errorf("wrong type passed to message channel, expected %T got %T", "", sm)
+				return
+			}
+			if sm != fmt.Sprintf("test%v", i) {
+				b.Errorf("wrong messages, expected %s got %s", fmt.Sprintf("test%v", i), sm)
+			}
+			i++
+			done <- true
+		}
+		if i != msgNumber {
+			b.Errorf("expected %v run, got %v", msgNumber, i)
+		}
+	}
+
+	for i := 0; i < b.N; i++ {
+		messages := make(chan interface{})
+		bc.Register(messages)
+		go listenerRoutine(messages)
+	}
+
+	for i := 0; i < b.N; i++ {
+		bc.Submit(fmt.Sprintf("test%v", i))
+	}
+	for i := 0; i < b.N; i++ {
+		<-done
+	}
+}
