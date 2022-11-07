@@ -18,3 +18,16 @@ type broadcaster struct {
 
 	outputs map[chan<- interface{}]bool
 }
+
+func NewBroadcaster(buflen int) Broadcaster {
+	return &broadcaster{}
+}
+
+func (b *broadcaster) Register(chan<- interface{})   {}
+func (b *broadcaster) Unregister(chan<- interface{}) {}
+func (b *broadcaster) Close() error {
+	return nil
+}
+func (b *broadcaster) Submit(interface{}) bool {
+	return true
+}
