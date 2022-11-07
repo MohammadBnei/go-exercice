@@ -72,6 +72,9 @@ func (ll *linkedList) Remove(index int) (*Node, error) {
 	current := ll.head
 
 	for index > 1 {
+		if current.NextNode == nil {
+			return nil, errors.New("index out of bound")
+		}
 		index--
 		current = current.NextNode
 	}
