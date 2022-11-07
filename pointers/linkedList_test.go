@@ -28,6 +28,7 @@ func TestPushAndGet(t *testing.T) {
 
 	second, _ := list.Get(0)
 	hey, _ := list.Get(1)
+	errNode, err := list.Get(33)
 
 	if hey.Data != "hey" {
 		t.Logf("Error on get. Should have \"hey\", have %v", hey.Data)
@@ -35,6 +36,11 @@ func TestPushAndGet(t *testing.T) {
 	}
 	if second.Data != 123 {
 		t.Logf("Error on get. Should have 123, have %v", second.Data)
+		t.Fail()
+	}
+
+	if err == nil {
+		t.Logf("Error on get. Should have an out of bounds error, have %v", errNode)
 		t.Fail()
 	}
 }

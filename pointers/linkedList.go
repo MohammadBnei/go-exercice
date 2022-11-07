@@ -49,6 +49,9 @@ func (ll *linkedList) Get(index int) (node *Node, err error) {
 	position := 0
 
 	for index != position {
+		if node == nil {
+			return nil, fmt.Errorf("%v out of bound", index)
+		}
 		position++
 		node = node.NextNode
 	}
