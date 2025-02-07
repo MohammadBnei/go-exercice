@@ -1,3 +1,3 @@
 module github.com/MohammadBnei/go-exercice
 
-go 1.19
+go 1.23
