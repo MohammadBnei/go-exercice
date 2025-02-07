@@ -9,7 +9,7 @@ import (
 )
 
 func TestBroadcaster(t *testing.T) {
-	bc := channels.NewBroadcaster(10)
+	bc := channels.NewBroadcaster[any](10)
 	defer bc.Close()
 
 	messages := make(chan interface{})
@@ -73,7 +73,7 @@ func TestBroadcaster(t *testing.T) {
 }
 
 func TestClosedBroadcaster(t *testing.T) {
-	bc := channels.NewBroadcaster(10)
+	bc := channels.NewBroadcaster[any](10)
 
 	messages := make(chan interface{})
 
@@ -86,14 +86,14 @@ func TestClosedBroadcaster(t *testing.T) {
 }
 
 func TestMultipleBroadcaster(t *testing.T) {
-	bc1 := channels.NewBroadcaster(10)
+	bc1 := channels.NewBroadcaster[string](10)
 
-	messages1 := make(chan interface{})
+	messages1 := make(chan string)
 
 	bc1.Register(messages1)
 	defer bc1.Close()
 
-	bc2 := channels.NewBroadcaster(10)
+	bc2 := channels.NewBroadcaster[any](10)
 
 	messages2 := make(chan interface{})
 
@@ -104,20 +104,15 @@ func TestMultipleBroadcaster(t *testing.T) {
 
 	wg.Add(2)
 
-	go func(msg <-chan interface{}) {
+	go func(msg <-chan string) {
 		defer wg.Done()
 		for i := 0; i < 3; i++ {
 			m, ok := <-msg
 			if !ok {
 				break
 			}
-			sm, ok := m.(string)
-			if !ok {
-				t.Errorf("wrong type passed to message channel, expected %T got %T", "", sm)
-				return
-			}
-			if sm != fmt.Sprintf("bc1 %v", i+1) {
-				t.Errorf("wrong messages, expected %s got %s", fmt.Sprintf("bc1 %v", i+1), sm)
+			if m != fmt.Sprintf("bc1 %v", i+1) {
+				t.Errorf("wrong messages, expected %s got %s", fmt.Sprintf("bc1 %v", i+1), m)
 
 			}
 		}
@@ -155,7 +150,7 @@ func TestMultipleBroadcaster(t *testing.T) {
 }
 
 func BenchmarkBroadcaster(b *testing.B) {
-	bc := channels.NewBroadcaster(1000)
+	bc := channels.NewBroadcaster[any](1000)
 	defer bc.Close()
 	done := make(chan bool)
 

@@ -1,33 +1,33 @@
 package channels
 
-type Broadcaster interface {
+type Broadcaster[T any] interface {
 	// Register a new channel to receive broadcasts
-	Register(chan<- interface{})
+	Register(chan<- T)
 	// Unregister a channel so that it no longer receives broadcasts.
-	Unregister(chan<- interface{})
+	Unregister(chan<- T)
 	// Shut this broadcaster down.
 	Close() error
 	// Submit a new object to all subscribers
-	Submit(interface{}) bool
+	Submit(T) bool
 }
 
-type broadcaster struct {
-	input chan interface{}
-	reg   chan chan<- interface{}
-	unreg chan chan<- interface{}
+type broadcaster[T any] struct {
+	input chan T
+	reg   chan chan<- T
+	unreg chan chan<- T
 
-	outputs map[chan<- interface{}]bool
+	outputs map[chan<- T]bool
 }
 
-func NewBroadcaster(buflen int) Broadcaster {
-	return &broadcaster{}
+func NewBroadcaster[T any](buflen int) Broadcaster[T] {
+	return &broadcaster[T]{}
 }
 
-func (b *broadcaster) Register(chan<- interface{})   {}
-func (b *broadcaster) Unregister(chan<- interface{}) {}
-func (b *broadcaster) Close() error {
+func (b *broadcaster[T]) Register(chan<- T)   {}
+func (b *broadcaster[T]) Unregister(chan<- T) {}
+func (b *broadcaster[T]) Close() error {
 	return nil
 }
-func (b *broadcaster) Submit(interface{}) bool {
+func (b *broadcaster[T]) Submit(T) bool {
 	return true
 }
